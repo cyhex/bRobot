@@ -134,10 +134,9 @@ bool serialOut() {
 
 
 void pid() {
-	// like ANGLE_TORQUE_RATIO
-	speedPid.Ki = 0.59; //analogRead(A0) / 1000.0; //0.49
-	speedPid.Kp  =19.8; //analogRead(A1) / 10.0; //19.8
-	speedPid.Kd = 54.0;//analogRead(A2) / 10.0; //44.0
+	speedPid.Ki = PID_Ki;
+	speedPid.Kp = PID_Kp;
+	speedPid.Kd = PID_Kd;
 
 	speedPid.p = angle.current * speedPid.Kp;
 	speedPid.d = (angle.current - angle.last) * speedPid.Kd;

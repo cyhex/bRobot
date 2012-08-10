@@ -55,6 +55,9 @@
 #define ACC_GYRO_RATIO 0.0001 // acc to gyro ratio
 
 
+#define PID_Ki 0.39 // 0.39 analogRead(A0)
+#define PID_Kp 21 // 19.8 analogRead(A1)
+#define PID_Kd 84   //44  analogRead(A2)
 
 struct pidStruct {
 	float p;
