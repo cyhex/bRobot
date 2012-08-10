@@ -1,0 +1,7 @@
+arduino uno
+dual mc33926 motor carier
+lipo 11.1 v / 1300 mAh power cell
+9 v block battery
+MinIMU-9 Gyro
+2x Motors, 12V 1A (max 2A), 50:1, 6kg/cm peak force
+big weels   
