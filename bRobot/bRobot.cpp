@@ -41,10 +41,15 @@ public:
 	}
 	bool read() {
 		readLine();
-		if(z > 60 ){
-			fwMotion = 0.1;
+		if( z > 0 ){
+			// maps speed 50 = 0, 0 = 0.04
+			fwMotion = 0.04 - (speed * 0.0006);
+			fwMotion = 0.06;
 		}else{
-			fwMotion = -0.1;
+			fwMotion = 0;
+		}
+		if(z < 80 && z > 50){
+			fwMotion *= -1;
 		}
 		return ready;
 	}
@@ -132,7 +137,7 @@ void setup() {
 	// init angle
 	angle.current=0.0;
 	angle.last=0.0;
-
+	angle.offset = 0.0;
 	// init balance
 	balance.a = 0;
 	balance.g = 0;
@@ -209,27 +214,22 @@ void pid() {
 
 }
 
-void remoteControll(){
-	if (bluetooth.read() == true) {
-		// fw/bw motion
-		// bluetooth.z
-		angle.current += bluetooth.fwMotion;
+void remoteControll() {
+	//bluetooth.read();
 
-
-		// left / rigth
-		// bluetooth.y
-
-
+	if (abs(angle.offset ) < 2 ) {
+		angle.current += angle.offset;
+		angle.offset += 0.5;
 	}
+
 }
 
 
 void loop() {
 	//callibrateManual();
 	readAngle();
-	//serialOut();
-
-	remoteControll();
+	serialOut();
+	//remoteControll();
 
 	pid();
 	m1.run(speed);

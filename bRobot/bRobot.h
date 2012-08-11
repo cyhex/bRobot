@@ -37,7 +37,7 @@
  */
 #define LSM303_SCALE 0b00000000
 #define LSM303_Gain 0.001
-#define LSM303_Gain_Offset 500 // in raw digits
+#define LSM303_Gain_Offset 380 // in raw digits
 
 /*
 
@@ -51,13 +51,13 @@
 */
 
 #define ANGLE_KILL 35 // kill motor above
-#define ACC_FILTER 0.1 // lowpass filter for acc
-#define ACC_GYRO_RATIO 0.0001 // acc to gyro ratio
+#define ACC_FILTER 0.01 // lowpass filter for acc
+#define ACC_GYRO_RATIO 0.005 // acc to gyro ratio
 
 
 #define PID_Ki 0.39 // 0.39 analogRead(A0)
-#define PID_Kp 21 // 19.8 analogRead(A1)
-#define PID_Kd 84   //44  analogRead(A2)
+#define PID_Kp 19 // 19.8 analogRead(A1)
+#define PID_Kd 44   //44  analogRead(A2)
 
 struct pidStruct {
 	float p;
@@ -71,6 +71,7 @@ struct pidStruct {
 struct angleStruct{
 	float current;
 	float last;
+	float offset;
 
 };
 
