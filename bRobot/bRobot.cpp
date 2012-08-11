@@ -6,6 +6,8 @@
 #include <L3G4200D.h>
 #include <math.h>
 #include <mc33926.h>
+#include <SoftwareSerial.h>
+
 
 L3G4200D gyro;
 LSM303 imu;
@@ -13,13 +15,74 @@ LSM303 imu;
 DCMotor m1(5,3);
 DCMotor m2(11,9);
 
+SoftwareSerial blueSerial(2,4); // RX, TX
+
 unsigned long serialOutLast = 0;
 int speed = 0;
-int ledsPins[4];
 
 pidStruct speedPid;
 angleStruct angle;
 balanceStruct balance;
+
+
+
+class serialBluetooth {
+public:
+	float x;
+	float y;
+	float z;
+	float fwMotion; // in deg
+	float sideMotion;// in deg
+
+	serialBluetooth(){
+		ready = false;
+		fwMotion=0;
+		sideMotion=0;
+	}
+	bool read() {
+		readLine();
+		if(z > 60 ){
+			fwMotion = 0.1;
+		}else{
+			fwMotion = -0.1;
+		}
+		return ready;
+	}
+
+private:
+	char str[18];
+	int i;
+	char c;
+	char * tok;
+	bool ready;
+
+	void parseArray(){
+		tok = strtok(str, ";");
+		x = atof(tok);
+		tok = strtok(NULL, ";");
+	    y = atof(tok);
+	    tok = strtok(NULL, ";");
+		z = atof(tok);
+	}
+
+	void readLine() {
+		ready = false;
+		if (blueSerial.available()) {
+			c = blueSerial.read();
+			if (c == 19) {
+				parseArray();
+				ready = true;
+			} else if (c == 'A') {
+				i = 0;
+			} else {
+				str[i] = c;
+				i++;
+			}
+		}
+	}
+
+} bluetooth;
+
 
 void callibrateManual(){
 	double gr = 0;
@@ -40,16 +103,7 @@ void callibrateManual(){
 }
 
 
-void ledAngle(){
-	int idicator = abs(angle.current) * 255;
-	for (int i = 0; i < (int) sizeof(ledsPins); i++) {
-		if (idicator > i * 255) {
-			digitalWrite(ledsPins[i], 1);
-		} else {
-			digitalWrite(ledsPins[i], 0);
-		}
-	}
-}
+
 void readAngle(){
 	angle.last = angle.current;
 	imu.read();
@@ -86,8 +140,10 @@ void setup() {
 	balance.a_raw = 0;
 
 
-	//Serial.begin(9600);
-	//Serial.println("Hello");
+	Serial.begin(9600);
+	Serial.println("Hello");
+	blueSerial.begin(9600);
+
 	Wire.begin();
 
 	gyro.enableDefault();
@@ -151,15 +207,29 @@ void pid() {
 		speed = 0;
 	}
 
-
-
 }
+
+void remoteControll(){
+	if (bluetooth.read() == true) {
+		// fw/bw motion
+		// bluetooth.z
+		angle.current += bluetooth.fwMotion;
+
+
+		// left / rigth
+		// bluetooth.y
+
+
+	}
+}
+
 
 void loop() {
 	//callibrateManual();
 	readAngle();
 	//serialOut();
-	//ledAngle();
+
+	remoteControll();
 
 	pid();
 	m1.run(speed);
