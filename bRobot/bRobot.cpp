@@ -217,9 +217,9 @@ void pid() {
 void remoteControll() {
 	//bluetooth.read();
 
-	if (abs(angle.offset ) < 2 ) {
-		angle.current += angle.offset;
-		angle.offset += 0.5;
+	if (abs(speed ) < 50 ) {
+		angle.current += 0.02;
+		angle.offset += 0.02;
 	}
 
 }

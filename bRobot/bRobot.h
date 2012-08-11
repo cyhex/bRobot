@@ -37,7 +37,7 @@
  */
 #define LSM303_SCALE 0b00000000
 #define LSM303_Gain 0.001
-#define LSM303_Gain_Offset 380 // in raw digits
+#define LSM303_Gain_Offset 480 // in raw digits
 
 /*
 
