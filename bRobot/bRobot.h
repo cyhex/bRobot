@@ -59,13 +59,19 @@
 #define PID_Kp 19 // 19.8 analogRead(A1)
 #define PID_Kd 44   //44  analogRead(A2)
 
-struct pidStruct {
+class pidController {
+public:
+
 	float p;
 	float i;
 	float d;
 	float Kp;
 	float Kd;
 	float Ki;
+	pidController();
+
+	float run(float setPoint, float currentPoint );
+
 };
 
 struct angleStruct{

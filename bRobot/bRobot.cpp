@@ -8,6 +8,15 @@
 #include <mc33926.h>
 #include <SoftwareSerial.h>
 
+pidController::pidController(){};
+float pidController::run(float setPoint, float currentPoint){
+	p = setPoint * Kp;
+	d = (setPoint - currentPoint) * Kd;
+	i = i + (setPoint * Ki);
+	return p+i+d;
+}
+
+
 
 L3G4200D gyro;
 LSM303 imu;
@@ -20,7 +29,9 @@ SoftwareSerial blueSerial(2,4); // RX, TX
 unsigned long serialOutLast = 0;
 int speed = 0;
 
-pidStruct speedPid;
+pidController pidBalance;
+pidController pidMotion;
+
 angleStruct angle;
 balanceStruct balance;
 
@@ -89,6 +100,9 @@ private:
 } bluetooth;
 
 
+
+
+
 void callibrateManual(){
 	double gr = 0;
 	double acc = 0;
@@ -126,13 +140,13 @@ void readAngle(){
 }
 
 void setup() {
-	// init pid
-	speedPid.p = 0.0;
-	speedPid.i = 0.0;
-	speedPid.d = 0.0;
-	speedPid.Kp = 0.0;
-	speedPid.Kd = 0.0;
-	speedPid.Ki = 0.0;
+	pidBalance.Kd = PID_Kd;
+	pidBalance.Ki = PID_Ki;
+	pidBalance.Kp = PID_Kp;
+
+	pidMotion.Kd = PID_Kd;
+	pidMotion.Ki = PID_Ki;
+	pidMotion.Kp = PID_Kp;
 
 	// init angle
 	angle.current=0.0;
@@ -181,31 +195,12 @@ bool serialOut() {
 	Serial.print(speed); // torque
 	Serial.println("");
 
-	Serial.print("PID");
-	Serial.print(" Ki: ");
-	Serial.print(speedPid.Ki);
-	Serial.print(" Kp: ");
-	Serial.print(speedPid.Kp);
-	Serial.print(" Kd:");
-	Serial.print(speedPid.Kd);
-	Serial.println("");
-
 	return false;
 }
 
 
-void pid() {
-	speedPid.Ki = PID_Ki;
-	speedPid.Kp = PID_Kp;
-	speedPid.Kd = PID_Kd;
-
-	speedPid.p = angle.current * speedPid.Kp;
-	speedPid.d = (angle.current - angle.last) * speedPid.Kd;
-	speedPid.i = speedPid.i + (angle.current * speedPid.Ki);
-
-	float pid =  speedPid.p + speedPid.d + speedPid.i;
-	speed = pid;
-
+void getSpeed() {
+	speed = pidBalance.run(angle.current,angle.last);
 	speed = max(speed, -255);
 	speed = min(speed, 255);
 	if (abs(angle.current) >= ANGLE_KILL) {
@@ -217,9 +212,9 @@ void pid() {
 void remoteControll() {
 	//bluetooth.read();
 
-	if (abs(speed ) < 50 ) {
-		angle.current += 0.02;
-		angle.offset += 0.02;
+	if (abs(speed ) < 100 ) {
+		//0.12
+		angle.current += (100 - abs(speed)) * 0.0012;
 	}
 
 }
@@ -230,8 +225,7 @@ void loop() {
 	readAngle();
 	serialOut();
 	//remoteControll();
-
-	pid();
+	getSpeed();
 	m1.run(speed);
 	m2.run(speed);
 	//delay(20);
