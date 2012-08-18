@@ -71,7 +71,6 @@ public:
 	pidController();
 
 	float run(float setPoint, float currentPoint );
-
 };
 
 struct angleStruct{

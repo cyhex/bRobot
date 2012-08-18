@@ -35,8 +35,6 @@ pidController pidMotion;
 angleStruct angle;
 balanceStruct balance;
 
-
-
 class serialBluetooth {
 public:
 	float x;
@@ -51,17 +49,23 @@ public:
 		sideMotion=0;
 	}
 	bool read() {
+
 		readLine();
+
+
 		if( z > 0 ){
 			// maps speed 50 = 0, 0 = 0.04
-			fwMotion = 0.04 - (speed * 0.0006);
-			fwMotion = 0.06;
+			float accelereation = 0.06;
+			fwMotion = (fwMotion * 0.8) + 0.2*(accelereation - (speed * (accelereation/50)));
 		}else{
 			fwMotion = 0;
 		}
+
 		if(z < 80 && z > 50){
-			fwMotion *= -1;
+			float accelereation = 0.16;
+			fwMotion = (fwMotion * 0.8) - 0.2*(accelereation - (speed * (accelereation/50)));
 		}
+
 		return ready;
 	}
 
@@ -144,9 +148,9 @@ void setup() {
 	pidBalance.Ki = PID_Ki;
 	pidBalance.Kp = PID_Kp;
 
-	pidMotion.Kd = PID_Kd;
-	pidMotion.Ki = PID_Ki;
-	pidMotion.Kp = PID_Kp;
+	pidMotion.Kd = 0.11;
+	pidMotion.Ki = 0.001;
+	pidMotion.Kp = 0.11;
 
 	// init angle
 	angle.current=0.0;
@@ -194,7 +198,8 @@ bool serialOut() {
 	Serial.print(":");
 	Serial.print(speed); // torque
 	Serial.println("");
-
+	Serial.print("offset: ");
+	Serial.println(angle.offset);
 	return false;
 }
 
@@ -210,11 +215,16 @@ void getSpeed() {
 }
 
 void remoteControll() {
-	//bluetooth.read();
+	if(bluetooth.read()==true){
+		//blueSerial.print("fwMotion: ");
+		//blueSerial.println(bluetooth.fwMotion);
 
-	if (abs(speed ) < 100 ) {
-		//0.12
-		angle.current += (100 - abs(speed)) * 0.0012;
+	}
+	//angle.offset = pidMotion.run(50,speed);
+	//angle.current += angle.offset;
+
+	if(abs(speed) < 50){
+		angle.current += bluetooth.fwMotion;
 	}
 
 }
@@ -223,12 +233,14 @@ void remoteControll() {
 void loop() {
 	//callibrateManual();
 	readAngle();
-	serialOut();
-	//remoteControll();
-	getSpeed();
+	//serialOut();
+	remoteControll();
+ 	getSpeed();
 	m1.run(speed);
 	m2.run(speed);
 	//delay(20);
+
+
 }
 
 
