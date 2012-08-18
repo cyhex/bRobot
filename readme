@@ -1,1 +1,25 @@
-hello
+Self balancing robot based on Arduino UNO ATmega328 microcontroller 
+http://arduino.cc/en/Main/ArduinoBoardUno/
+
+Hardware list:
+    arduino uno
+    dual mc33926 motor carier
+    lipo 11.1 v / 1300 mAh power cell
+    MinIMU-9 Gyro
+    2x Motors, 12V 1A (max 2A), 50:1 gear ratio, 6kg/cm peak force
+    big weels
+
+
+
+Operation basics:
+
+    Read raw gyro
+    Read raw accelerometer 
+    Calculate current angle
+    Calculate engine torque with PID controller 
+    Correct current position
+    Do the same thing over and over again ( should be around 100 Hz )
+
+Notes:
+I decided against Kalman filter in favor of Complementary Filter 
+as its has almost same performance but without the complexity of Kalman filter.
