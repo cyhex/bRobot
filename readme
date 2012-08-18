@@ -1,4 +1,3 @@
-
 Self balancing robot based on Arduino UNO ATmega328 microcontroller 
 http://arduino.cc/en/Main/ArduinoBoardUno/
 
@@ -15,21 +14,12 @@ Hardware list:
 Operation basics:
 
     Read raw gyro
-    Read raw acceleromter 
+    Read raw accelerometer 
     Calculate current angle
     Calculate engine torque with PID controller 
-    Correct current postion
+    Correct current position
     Do the same thing over and over again ( should be around 100 Hz )
 
 Notes:
-I desided against Kalman filter in favor of Complementary Filter 
-as its has almost same preformace but without the complexitiy of Kalman filter.
-
-
-
-
-
-
-
-
-
+I decided against Kalman filter in favor of Complementary Filter 
+as its has almost same performance but without the complexity of Kalman filter.
