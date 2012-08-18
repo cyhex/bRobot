@@ -52,7 +52,6 @@ public:
 
 		readLine();
 
-
 		if( z > 0 ){
 			// maps speed 50 = 0, 0 = 0.04
 			float accelereation = 0.06;
@@ -215,14 +214,7 @@ void getSpeed() {
 }
 
 void remoteControll() {
-	if(bluetooth.read()==true){
-		//blueSerial.print("fwMotion: ");
-		//blueSerial.println(bluetooth.fwMotion);
-
-	}
-	//angle.offset = pidMotion.run(50,speed);
-	//angle.current += angle.offset;
-
+	bluetooth.read();
 	if(abs(speed) < 50){
 		angle.current += bluetooth.fwMotion;
 	}
