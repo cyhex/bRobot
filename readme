@@ -23,3 +23,7 @@ Operation basics:
 Notes:
 I decided against Kalman filter in favor of Complementary Filter 
 as its has almost same performance but without the complexity of Kalman filter.
+
+
+video:
+http://www.youtube.com/watch?v=coYkNLxFi1g
